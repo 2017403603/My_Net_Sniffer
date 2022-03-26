@@ -1,14 +1,20 @@
 package com.company.View;
 
+import com.company.Control.CapturePackage;
+import com.company.Control.NetworkCard;
+import org.jnetpcap.PcapIf;
 import org.junit.Test;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @ClassName AppFrame  //类名称
@@ -45,18 +51,14 @@ public class AppFrame extends JFrame {
     //表模型
     DefaultTableModel tableModel;
     //表内容
-    Object[][] DataList = {{1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
+    Object[][] DataList = {/*{1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
             {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
             {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
             {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
             {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1}};
-
+            {1, 1, 1, 1, 1}*/};
+    //UI部分
     public AppFrame() {
-    }
-
-    @Test
-    public void mainUI() {
         //标题设置
         this.setTitle("网络嗅探器1.0");
         //起始坐标、长宽
@@ -156,5 +158,50 @@ public class AppFrame extends JFrame {
                 System.exit(0);
             }
         });
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //所有网卡列表
+    List<PcapIf> alldevs;
+    //抓包类
+    CapturePackage capturePackage;
+    ////////////////////////////////////////////////////////////////////////////////////
+    //数据填充
+    @Test
+    public void dataInjection() {
+        //获取所有显卡
+        alldevs = new NetworkCard().getAlldevs();
+        //动态初始化条目
+        jMenuItems = new JMenuItem[alldevs.size()];
+        int i = 0;
+        //遍历网卡：显示网卡编号和描述信息
+        for (PcapIf device : alldevs) {
+            String description = (device.getDescription() != null) ? device.getDescription()
+                    : "No description available";
+            jMenuItems[i] = new JMenuItem("#"+i + ": " + device.getName() + "["
+                    + description  + "]");
+            //字体设置
+            jMenuItems[i].setFont(new Font("", Font.BOLD, 15));
+            jMenu1.add(jMenuItems[i]);
+            jMenuItems[i].addActionListener(
+                    new CardActionListener(device));
+            i++;
+        }
+        //初始化抓包类
+        capturePackage = new CapturePackage();
+        //初始化表模型
+        capturePackage.setTablemodel(tableModel);
+    }
+    //为每张网卡绑定响应事件
+    private class CardActionListener implements ActionListener {
+
+        PcapIf device;
+        CardActionListener(PcapIf device){
+            this.device = device;
+        }
+        public void actionPerformed(ActionEvent e) {
+            capturePackage.setDevice(device);
+            capturePackage.setFilterMess("");
+            new Thread(capturePackage).start();   //开启抓包线程
+        }
     }
 }
