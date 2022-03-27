@@ -25,7 +25,7 @@ public class NetworkCard {
     StringBuilder errbuf = new StringBuilder();
 
     @Test
-    public List<PcapIf> getAlldevs(){
+    public List<PcapIf> getAlldevs() {
         //读取网卡
         int r = Pcap.findAllDevs(alldevs, errbuf);
         //判断是否读取成功

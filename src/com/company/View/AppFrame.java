@@ -1,6 +1,7 @@
 package com.company.View;
 
 import com.company.Control.CapturePackage;
+import com.company.Model.HandlerInfo;
 import com.company.Control.NetworkCard;
 import org.jnetpcap.PcapIf;
 import org.junit.Test;
@@ -13,12 +14,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @ClassName AppFrame  //类名称
- * @Description: 类描述
+ * @Description: 类描述  图形界面
  * @Author: 程哥哥    //作者
  * @CreateDate: 2022/3/24 23:12	//创建时间
  * @UpdateUser: 更新人
@@ -35,7 +35,7 @@ public class AppFrame extends JFrame {
     //菜单项
     JMenuItem[] jMenuItems;
     //菜单条目
-    JMenuItem item1, item2, item3;
+    JMenuItem item1, item2, item3, item4, item5, item6, item7;
     //原地址、目的地址、搜索地址按钮
     JButton srcButton, desButton, searchButton;
     //容器
@@ -46,17 +46,15 @@ public class AppFrame extends JFrame {
     JTable jTable;
     //表头内容
     final String[] head = new String[]{
-            "时间", "源IP", "目的IP", "协议", "长度"
+            "时间", "源IP或源MAC", "目的IP或目的MAC", "协议", "长度"
     };
     //表模型
     DefaultTableModel tableModel;
     //表内容
-    Object[][] DataList = {/*{1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1}*/};
+    Object[][] DataList = {};
+    //处理信息
+    HandlerInfo handlerInfo;
+
     //UI部分
     public AppFrame() {
         //标题设置
@@ -73,19 +71,35 @@ public class AppFrame extends JFrame {
         jMenu2 = new JMenu("  协议  ");
         //设置字体
         jMenu2.setFont(new Font("", Font.BOLD, 20));
-        item1 = new JMenuItem(" ICMP ");
+        item1 = new JMenuItem(" Ethernet II ");
         //设置字体
         item1.setFont(new Font("", Font.BOLD, 20));
-        item2 = new JMenuItem(" TCP ");
+        item2 = new JMenuItem(" IP ");
         //设置字体
         item2.setFont(new Font("", Font.BOLD, 20));
-        item3 = new JMenuItem(" UDP ");
+        item3 = new JMenuItem(" ICMP ");
         //设置字体
         item3.setFont(new Font("", Font.BOLD, 20));
+        item4 = new JMenuItem(" ARP ");
+        //设置字体
+        item4.setFont(new Font("", Font.BOLD, 20));
+        item5 = new JMenuItem(" UDP ");
+        //设置字体
+        item5.setFont(new Font("", Font.BOLD, 20));
+        item6 = new JMenuItem(" TCP ");
+        //设置字体
+        item6.setFont(new Font("", Font.BOLD, 20));
+        item7 = new JMenuItem(" HTTP ");
+        //设置字体
+        item7.setFont(new Font("", Font.BOLD, 20));
         //加入菜单选项
         jMenu2.add(item1);
         jMenu2.add(item2);
         jMenu2.add(item3);
+        jMenu2.add(item4);
+        jMenu2.add(item5);
+        jMenu2.add(item6);
+        jMenu2.add(item7);
         //根据源ip地址过滤
         srcButton = new JButton(" 源IP ");
         //设置字体
@@ -159,11 +173,13 @@ public class AppFrame extends JFrame {
             }
         });
     }
+
     ///////////////////////////////////////////////////////////////////////////////////////
     //所有网卡列表
     List<PcapIf> alldevs;
     //抓包类
     CapturePackage capturePackage;
+
     ////////////////////////////////////////////////////////////////////////////////////
     //数据填充
     @Test
@@ -177,30 +193,143 @@ public class AppFrame extends JFrame {
         for (PcapIf device : alldevs) {
             String description = (device.getDescription() != null) ? device.getDescription()
                     : "No description available";
-            jMenuItems[i] = new JMenuItem("#"+i + ": " + device.getName() + "["
-                    + description  + "]");
+            jMenuItems[i] = new JMenuItem("#" + i + ": " + device.getName() + "["
+                    + description + "]");
             //字体设置
             jMenuItems[i].setFont(new Font("", Font.BOLD, 15));
             jMenu1.add(jMenuItems[i]);
-            jMenuItems[i].addActionListener(
-                    new CardActionListener(device));
+            jMenuItems[i].addActionListener(new CardActionListener(device));
             i++;
         }
         //初始化抓包类
         capturePackage = new CapturePackage();
-        //初始化表模型
-        capturePackage.setTablemodel(tableModel);
+        //初始化处理器信息
+        handlerInfo = new HandlerInfo();
+        handlerInfo.setTablemodel(tableModel);
+        //item1绑定事件
+        item1.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e3) {
+                        handlerInfo.setFilterProtocol("Ethernet II");
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        item2.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e3) {
+                        handlerInfo.setFilterProtocol("IP");
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        item3.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e3) {
+                        handlerInfo.setFilterProtocol("ICMP");
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        item4.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e3) {
+                        handlerInfo.setFilterProtocol("ARP");
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        item5.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e3) {
+                        handlerInfo.setFilterProtocol("UDP");
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        item6.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e3) {
+                        handlerInfo.setFilterProtocol("TCP");
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        item7.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e3) {
+                        handlerInfo.setFilterProtocol("HTTP");
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        srcButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String fsip = JOptionPane.showInputDialog("请输入源IP，以筛选数据包：");
+                        handlerInfo.setFilterSrcip("src " + fsip);
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        desButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String fdip = JOptionPane.showInputDialog("请输入目的IP，以筛选数据包：");
+                        handlerInfo.setFilterDesip("des " + fdip);
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
+        searchButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String fkeyword = JOptionPane.showInputDialog("请输入数据关键字，以筛选数据包：");
+                        handlerInfo.setFilterKey("keyword " + fkeyword);
+                        handlerInfo.clearpackets();
+                        while (tableModel.getRowCount() > 0) {
+                            tableModel.removeRow(tableModel.getRowCount() - 1);
+                        }
+                    }
+                });
     }
+
     //为每张网卡绑定响应事件
     private class CardActionListener implements ActionListener {
-
         PcapIf device;
-        CardActionListener(PcapIf device){
+
+        CardActionListener(PcapIf device) {
             this.device = device;
         }
+
         public void actionPerformed(ActionEvent e) {
             capturePackage.setDevice(device);
-            capturePackage.setFilterMess("");
+            capturePackage.setHandlerInfo(handlerInfo);
             new Thread(capturePackage).start();   //开启抓包线程
         }
     }
