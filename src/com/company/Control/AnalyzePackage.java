@@ -202,106 +202,28 @@ public class AnalyzePackage {
         }
         analyzeResult.put("协议", "HTTP");
     }
-    ///////////////////////////////////////////
-    /*
-    //IP包具体分析
-    public static HashMap<String, String> IPanalyze() throws UnknownHostException {
-        //临时存储
-        HashMap<String, String> temp = new HashMap<String, String>();
-        if (!packet.hasHeader(Ip4.ID)) {
-            System.out.println("该包不是IP数据包");
+
+    public static HashMap<String,String> IPanalyze() throws UnknownHostException {
+        HashMap<String,String> att = new HashMap<String,String>();
+        if(!packet.hasHeader(Ip4.ID)) {
             return null;
         }
-        //ip4格式
-        ip = packet.getHeader(ip);
-        //这里获取的IP地址同样是byte[]，而不是我们熟悉的十进制
-        byte[] sources = ip.source();
-        byte[] destinations = ip.destination();
-        //字节数组转为InetAddress再转为String
-        InetAddress sourceAddress = InetAddress.getByAddress(sources);
-        InetAddress destinationAddress = InetAddress.getByAddress(destinations);
-        String SrcIP = sourceAddress.getHostAddress();
-        String DesIP = destinationAddress.getHostAddress();
-        temp.put("协议",new String("IP"));
-        temp.put("源IP",SrcIP);
-        temp.put("目的IP",DesIP);
-        temp.put("TTL", String.valueOf(ip.ttl()));
-        temp.put("头长度", String.valueOf(ip.getHeader().length));
-        temp.put("是否有其他切片", String.valueOf(ip.isFragment()));
-        return temp;
-    }
-    //ICMP包具体分析
-    public static HashMap<String, String> ICMPanalyze() throws UnknownHostException {
-        //临时存储
-        HashMap<String, String> temp = new HashMap<String, String>();
-        if (!packet.hasHeader(Icmp.ID)) {
-            System.out.println("该包不是ICMP数据包");
-            return null;
-        }
-        icmp=packet.getHeader(icmp);
-        byte[] buff = new byte[packet.getTotalSize()];
-        packet.transferStateAndDataTo(buff);
-        JBuffer jb = new JBuffer(buff);
-        String content = jb.toHexdump();
-        temp.put("协议",new String("ICMP"));
-        ///////////////
         Ip4 ip4 = packet.getHeader(new Ip4());
-        byte[] sIP = new byte[4], dIP = new byte[4];
-        sIP = ip.source();
-        dIP = ip.destination();
-        String srcIP = org.jnetpcap.packet.format.FormatUtils.ip(sIP);
-        String dstIP = org.jnetpcap.packet.format.FormatUtils.ip(dIP);
-        ///////////////
-        temp.put("源IP",srcIP);
-        temp.put("目的IP",dstIP);
-        temp.put("ICMP包内容", content)
-        return temp;
-    }
-    //TCP包具体分析
-    public static HashMap<String, String> TCPanalyze() {
-        //临时存储
-        HashMap<String, String> temp = new HashMap<String, String>();
-        if (!packet.hasHeader(Tcp.ID)) {
-            System.out.println("该包不是TCP数据包");
-            return null;
-        }
-        //获取tcp包
-        tcp=packet.getHeader(tcp);
-        //目标端口和源端口
-        String srcPort = String.valueOf(tcp.source());
-        String dstPort = String.valueOf(tcp.destination());
-        temp.put("协议", new String("TCP"));
-        temp.put("源端口",srcPort);
-        temp.put("目的端口", dstPort);
-        byte[] buff = new byte[packet.getTotalSize()];
-        packet.transferStateAndDataTo(buff);
-        JBuffer jb = new JBuffer(buff);
-        //获得TCP包内容
-        String content = jb.toHexdump();
-        temp.put("TCP包内容", content);
-        temp.put("", );
-        return temp;
-    }
+        //这里获取的IP地址同样是byte[]，而不是我们熟悉的十进制
+        byte[] sources = ip4.source();
+        byte[] destinations = ip4.destination();
+        InetAddress sourceAddress = InetAddress.getByAddress(sources);
+        String srcip= sourceAddress.getHostAddress();
+        InetAddress desAddress = InetAddress.getByAddress(destinations);
+        String desip= desAddress.getHostAddress();
 
-    public static HashMap<String, String> UDPanalyze() {
-        att = new HashMap<String, String>();
-        UDPPacket udpppacket = (UDPPacket) packet;
-        EthernetPacket ethernetPacket = (EthernetPacket) packet.datalink;
-        att.put("协议", new String("UDP"));
-        att.put("源IP", udpppacket.src_ip.toString().substring(1, udpppacket.src_ip.toString().length()));
-        att.put("源端口", String.valueOf(udpppacket.src_port));
-        att.put("目的IP", udpppacket.dst_ip.toString().substring(1, udpppacket.dst_ip.toString().length()));
-        att.put("目的端口", String.valueOf(udpppacket.dst_port));
-        att.put("源MAC", ethernetPacket.getSourceAddress());
-        att.put("目的MAC", ethernetPacket.getDestinationAddress());
-        try {
-            att.put("数据", new String(udpppacket.data, "gbk"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
+        att.put("协议", new String("IP"));
+        att.put("源IP", srcip);
+        att.put("目的IP", desip);
+        att.put("TTL", String.valueOf(ip4.ttl()));
+        att.put("头长度", String.valueOf(ip4.getHeader().length));
+        att.put("是否有其他切片", String.valueOf(ip4.isFragment()));
         return att;
     }
 
-     */
 }

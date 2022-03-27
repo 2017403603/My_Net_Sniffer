@@ -18,7 +18,6 @@ import org.jnetpcap.packet.PcapPacketHandler;
 
 public class MyPcapHandler<Object> implements PcapPacketHandler<Object> {
     FilterUtils filterUtils;
-
     @Override
     public void nextPacket(PcapPacket packet, Object handlerInfo) {
         HandlerInfo Info = (HandlerInfo) handlerInfo;

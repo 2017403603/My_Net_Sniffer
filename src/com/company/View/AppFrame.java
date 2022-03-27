@@ -1,20 +1,24 @@
 package com.company.View;
 
+import com.company.Control.AnalyzePackage;
 import com.company.Control.CapturePackage;
 import com.company.Model.HandlerInfo;
 import com.company.Control.NetworkCard;
 import org.jnetpcap.PcapIf;
+import org.jnetpcap.packet.PcapPacket;
 import org.junit.Test;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.io.FileOutputStream;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName AppFrame  //类名称
@@ -317,6 +321,64 @@ public class AppFrame extends JFrame {
                         }
                     }
                 });
+        jTable.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent ev){
+                if(ev.getClickCount() == 2){
+                    int row = jTable.getSelectedRow();
+                    JFrame frame = new JFrame("详细信息");
+                    JPanel panel = new JPanel();
+                    final JTextArea info = new JTextArea(23, 42);
+                    info.setEditable(false);
+                    info.setLineWrap(true);
+                    info.setWrapStyleWord(true);
+                    frame.add(panel);
+                    panel.add(new JScrollPane(info));
+                    JButton save = new JButton("保存到本地");
+                    save.addActionListener(
+                            new ActionListener(){
+                                public void actionPerformed(ActionEvent e3) {
+                                    String text = info.getText();
+                                    int name = (int)System.currentTimeMillis();
+                                    try {
+                                        FileOutputStream fos = new FileOutputStream("d://cgg_sniffer//"+name+".txt");
+                                        fos.write(text.getBytes());
+                                        fos.close();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                    panel.add(save);
+                    frame.setBounds(150, 150, 500, 500);
+                    frame.setVisible(true);
+                    frame.setResizable(false);
+                    ArrayList<PcapPacket> packetlist = handlerInfo.packetlist;
+                    Map<String,String> hm1 = new HashMap<String,String>();
+                    Map<String,String> hm2 = new HashMap<String,String>();
+                    PcapPacket packet = packetlist.get(row);
+                    info.append("------------------------------------------------------------------------------\n");
+                    info.append("-------------------------------IP头信息：-------------------------------\n");
+                    info.append("------------------------------------------------------------------------------\n");
+                    try {
+                        hm1 = new AnalyzePackage(packet).IPanalyze();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                    for(Map.Entry<String,String> me1 : hm1.entrySet())
+                    {
+                        info.append(me1.getKey()+" : "+me1.getValue()+"\n");
+                    }
+                    hm2 = new AnalyzePackage(packet).Analyzed();
+                    info.append("------------------------------------------------------------------------------\n");
+                    info.append("-----------------------------"+hm2.get("协议")+"头信息：-----------------------------\n");
+                    info.append("------------------------------------------------------------------------------\n");
+                    for(Map.Entry<String,String> me : hm2.entrySet())
+                    {
+                        info.append(me.getKey()+" : "+me.getValue()+"\n");
+                    }
+                }
+            }
+        });
     }
 
     //为每张网卡绑定响应事件
