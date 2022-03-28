@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @ClassName Filter  //类名称
@@ -31,6 +32,8 @@ public class HandlerInfo {
     public static String FilterKey = "";
     //抓到的包存储
     public static ArrayList<PcapPacket> packetlist = new ArrayList<PcapPacket>();
+    //抓到的包分析
+    public static ArrayList<PcapPacket> analyzePacketlist = new ArrayList<PcapPacket>();
     //UI表模型
     public static DefaultTableModel tablemodel;
 
@@ -58,6 +61,7 @@ public class HandlerInfo {
     public void clearpackets() {
         packetlist.clear();
     }
+    //
 
     //将抓到包的信息添加到列表
     public static void showTable(PcapPacket packet) {
@@ -68,16 +72,17 @@ public class HandlerInfo {
     //将抓的包的基本信息显示在列表上，返回信息的String[]形式
     public static String[] getObj(PcapPacket packet) {
         String[] data = new String[6];
-        if (packet != null && new AnalyzePackage(packet).Analyzed().size() >= 3) {
+        if (packet != null) {
             //捕获时间
             Date date = new Date(packet.getCaptureHeader().timestampInMillis());
             DateFormat df = new SimpleDateFormat("HH:mm:ss");
             data[0] = df.format(date);
-            data[1] = new AnalyzePackage(packet).Analyzed().get("源IP").equals("未知") ?
-                    new AnalyzePackage(packet).Analyzed().get("源MAC") : new AnalyzePackage(packet).Analyzed().get("源IP");
-            data[2] = new AnalyzePackage(packet).Analyzed().get("目的IP").equals("未知") ?
-                    new AnalyzePackage(packet).Analyzed().get("目的MAC") : new AnalyzePackage(packet).Analyzed().get("目的IP");
-            data[3] = new AnalyzePackage(packet).Analyzed().get("协议");
+            HashMap<String,String> hm = new AnalyzePackage(packet).Analyzed();
+            data[1] = hm.get("源IP4").equals("未知") ? hm.get("源MAC") : hm.get("源IP4");
+            data[1]+=hm.get("源IP6").equals("未知") ? "": "\n"+hm.get("源IP6");
+            data[2] = hm.get("目的IP4").equals("未知") ? hm.get("目的MAC") : hm.get("目的IP4");
+            data[2]+=hm.get("目的IP6").equals("未知") ? "" : "\n"+hm.get("目的IP6");
+            data[3] = hm.get("协议");
             data[4] = String.valueOf(packet.getCaptureHeader().wirelen());
         }
         return data;

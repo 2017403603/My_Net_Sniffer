@@ -23,6 +23,7 @@ public class MyPcapHandler<Object> implements PcapPacketHandler<Object> {
         HandlerInfo Info = (HandlerInfo) handlerInfo;
         if (packet != null && filterUtils.IsFilter(packet, Info.FilterProtocol, Info.FilterSrcip, Info.FilterDesip, Info.FilterKey)) {
             Info.packetlist.add(packet);
+            Info.analyzePacketlist.add(packet);
             Info.showTable(packet);
             System.out.println(packet);
         }

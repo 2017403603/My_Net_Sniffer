@@ -20,7 +20,8 @@ public class CapturePackage implements Runnable {
     private PcapIf device;
     //处理器信息
     private HandlerInfo handlerInfo;
-    //这个类是与 libpcap 和 winpcap 库实现中的原生 pcap_t 结构对等的Java类。 它提供了Java 与libpcap 库方法的直接映射。
+    //这个类是与 libpcap 和 winpcap 库实现中的原生 pcap_t 结构对等的Java类。
+    // 它提供了Java 与libpcap 库方法的直接映射。
     static Pcap pcap;
 
     public CapturePackage() {
@@ -47,6 +48,15 @@ public class CapturePackage implements Runnable {
         this.handlerInfo = handlerInfo;
     }
 
+    //休眠50ms
+    public void sleep(){
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         //截断此大小的数据包
@@ -71,8 +81,16 @@ public class CapturePackage implements Runnable {
         String user = "程哥哥";
         while (true) {
             //设置抓包速率与间隔
-            //每个数据包将被分派到抓包处理器Handler
+            long startTime = System.currentTimeMillis();
+//            while (startTime + 1000 >= System.currentTimeMillis()) {
+                //每个数据包将被分派到抓包处理器Handler
             pcap.loop(cnt, myPcapHandler, handlerInfo);
+//            }
+            try {
+                Thread.sleep(0);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.out.println("list的大小为：" + handlerInfo.packetlist.size());
         }
 //        pcap.close();

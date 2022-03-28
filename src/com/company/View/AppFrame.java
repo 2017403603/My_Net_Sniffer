@@ -216,10 +216,10 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("Ethernet II");
-                        handlerInfo.clearpackets();
                         while (tableModel.getRowCount() > 0) {
                             tableModel.removeRow(tableModel.getRowCount() - 1);
                         }
+                        handlerInfo.clearpackets();
                     }
                 });
         item2.addActionListener(
@@ -359,11 +359,7 @@ public class AppFrame extends JFrame {
                     info.append("------------------------------------------------------------------------------\n");
                     info.append("-------------------------------IP头信息：-------------------------------\n");
                     info.append("------------------------------------------------------------------------------\n");
-                    try {
-                        hm1 = new AnalyzePackage(packet).IPanalyze();
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    }
+                    hm1 = new AnalyzePackage(packet).Analyzed();
                     for(Map.Entry<String,String> me1 : hm1.entrySet())
                     {
                         info.append(me1.getKey()+" : "+me1.getValue()+"\n");
@@ -379,8 +375,10 @@ public class AppFrame extends JFrame {
                 }
             }
         });
-    }
 
+    }
+    //表示整个抓包进程
+    Thread capthread=null;
     //为每张网卡绑定响应事件
     private class CardActionListener implements ActionListener {
         PcapIf device;
@@ -390,9 +388,18 @@ public class AppFrame extends JFrame {
         }
 
         public void actionPerformed(ActionEvent e) {
-            capturePackage.setDevice(device);
-            capturePackage.setHandlerInfo(handlerInfo);
-            new Thread(capturePackage).start();   //开启抓包线程
+            if (capthread==null){
+                capturePackage.setDevice(device);
+                capturePackage.setHandlerInfo(handlerInfo);
+                capthread=new Thread(capturePackage);
+                capthread.start();   //开启抓包线程
+            }else {
+                capturePackage.setDevice(device);
+                handlerInfo.clearpackets();
+                while (tableModel.getRowCount() > 0) {
+                    tableModel.removeRow(tableModel.getRowCount() - 1);
+                }
+            }
         }
     }
 }
