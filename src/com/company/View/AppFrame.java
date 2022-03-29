@@ -6,6 +6,14 @@ import com.company.Model.HandlerInfo;
 import com.company.Control.NetworkCard;
 import org.jnetpcap.PcapIf;
 import org.jnetpcap.packet.PcapPacket;
+import org.jnetpcap.protocol.lan.Ethernet;
+import org.jnetpcap.protocol.network.Arp;
+import org.jnetpcap.protocol.network.Icmp;
+import org.jnetpcap.protocol.network.Ip4;
+import org.jnetpcap.protocol.network.Ip6;
+import org.jnetpcap.protocol.tcpip.Http;
+import org.jnetpcap.protocol.tcpip.Tcp;
+import org.jnetpcap.protocol.tcpip.Udp;
 import org.junit.Test;
 
 import javax.swing.*;
@@ -216,10 +224,7 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("Ethernet II");
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
-                        handlerInfo.clearpackets();
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         item2.addActionListener(
@@ -227,10 +232,7 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("IP");
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         item3.addActionListener(
@@ -238,10 +240,7 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("ICMP");
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         item4.addActionListener(
@@ -249,10 +248,7 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("ARP");
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         item5.addActionListener(
@@ -260,10 +256,7 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("UDP");
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         item6.addActionListener(
@@ -271,10 +264,7 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("TCP");
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         item7.addActionListener(
@@ -282,10 +272,7 @@ public class AppFrame extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e3) {
                         handlerInfo.setFilterProtocol("HTTP");
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         srcButton.addActionListener(
@@ -293,10 +280,7 @@ public class AppFrame extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         String fsip = JOptionPane.showInputDialog("请输入源IP，以筛选数据包：");
                         handlerInfo.setFilterSrcip("src " + fsip);
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         desButton.addActionListener(
@@ -304,10 +288,7 @@ public class AppFrame extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         String fdip = JOptionPane.showInputDialog("请输入目的IP，以筛选数据包：");
                         handlerInfo.setFilterDesip("des " + fdip);
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         searchButton.addActionListener(
@@ -315,25 +296,29 @@ public class AppFrame extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         String fkeyword = JOptionPane.showInputDialog("请输入数据关键字，以筛选数据包：");
                         handlerInfo.setFilterKey("keyword " + fkeyword);
-                        handlerInfo.clearpackets();
-                        while (tableModel.getRowCount() > 0) {
-                            tableModel.removeRow(tableModel.getRowCount() - 1);
-                        }
+                        handlerInfo.ShowAfterFilter();
                     }
                 });
         jTable.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent ev){
                 if(ev.getClickCount() == 2){
+                    //获得选取行
                     int row = jTable.getSelectedRow();
+                    //标题
                     JFrame frame = new JFrame("详细信息");
+                    //画布
                     JPanel panel = new JPanel();
+                    //文本区域大小
                     final JTextArea info = new JTextArea(23, 42);
+                    //是否可编辑
                     info.setEditable(false);
                     info.setLineWrap(true);
                     info.setWrapStyleWord(true);
                     frame.add(panel);
+                    //加滚动条
                     panel.add(new JScrollPane(info));
                     JButton save = new JButton("保存到本地");
+                    //保存事件绑定
                     save.addActionListener(
                             new ActionListener(){
                                 public void actionPerformed(ActionEvent e3) {
@@ -348,30 +333,72 @@ public class AppFrame extends JFrame {
                                     }
                                 }
                             });
+                    //加入保存按钮并且设置
                     panel.add(save);
                     frame.setBounds(150, 150, 500, 500);
                     frame.setVisible(true);
                     frame.setResizable(false);
-                    ArrayList<PcapPacket> packetlist = handlerInfo.packetlist;
-                    Map<String,String> hm1 = new HashMap<String,String>();
-                    Map<String,String> hm2 = new HashMap<String,String>();
+                    //获取数据包
+                    ArrayList<PcapPacket> packetlist = handlerInfo.analyzePacketlist;
+                    //获得分析后的信息
+                    Map<String,String> hm = new HashMap<String,String>();
                     PcapPacket packet = packetlist.get(row);
-                    info.append("------------------------------------------------------------------------------\n");
-                    info.append("-------------------------------IP头信息：-------------------------------\n");
-                    info.append("------------------------------------------------------------------------------\n");
-                    hm1 = new AnalyzePackage(packet).Analyzed();
-                    for(Map.Entry<String,String> me1 : hm1.entrySet())
-                    {
-                        info.append(me1.getKey()+" : "+me1.getValue()+"\n");
+                    hm = new AnalyzePackage(packet).Analyzed();
+                    info.append("                               "+hm.get("协议")+"数据包"+"                               \n\n\n");
+                    if(packet.hasHeader(Ethernet.ID)){
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("-------------------------------Ethernet头信息：-------------------------------\n");
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("源MAC"+" : "+hm.get("源MAC")+"\n");
+                        info.append("源MAC地址类型"+" : "+hm.get("源MAC地址类型")+"\n");
+                        info.append("源主机传播方式"+" : "+hm.get("源主机传播方式")+"\n");
+                        info.append("目的MAC"+" : "+hm.get("目的MAC")+"\n");
+                        info.append("目的MAC地址类型"+" : "+hm.get("目的MAC地址类型")+"\n");
+                        info.append("目的主机传播方式"+" : "+hm.get("目的主机传播方式")+"\n");
                     }
-                    hm2 = new AnalyzePackage(packet).Analyzed();
-                    info.append("------------------------------------------------------------------------------\n");
-                    info.append("-----------------------------"+hm2.get("协议")+"头信息：-----------------------------\n");
-                    info.append("------------------------------------------------------------------------------\n");
-                    for(Map.Entry<String,String> me : hm2.entrySet())
-                    {
-                        info.append(me.getKey()+" : "+me.getValue()+"\n");
+                    if(packet.hasHeader(Ip4.ID)||packet.hasHeader(Ip6.ID)){
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("-------------------------------IP头信息：-------------------------------\n");
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("IP协议版本"+" : "+hm.get("IP协议版本")+"\n");
+                        info.append("头长度"+" : "+packet.getCaptureHeader().wirelen()+"\n");
+                        info.append("源IP4地址"+" : "+hm.get("源IP4")+"\n");
+                        info.append("源IP6地址"+" : "+hm.get("源IP6")+"\n");
+                        info.append("目的IP4地址"+" : "+hm.get("目的IP4")+"\n");
+                        info.append("目的IP6地址"+" : "+hm.get("目的IP6")+"\n");
+                    }else if(packet.hasHeader(new Arp())){
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("-------------------------------ARP头信息：-------------------------------\n");
+                        info.append("------------------------------------------------------------------------------\n");
                     }
+                    if (packet.hasHeader(Tcp.ID)){
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("-------------------------------TCP头信息：-------------------------------\n");
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("源主机端口"+" : "+hm.get("源端口")+"\n");
+                        info.append("目的主机端口"+" : "+hm.get("目的端口")+"\n");
+                        info.append("是否有SYN标志位"+" : "+hm.get("Syn")+"\n");
+                        info.append("是否有FIN标志位"+" : "+hm.get("Fin")+"\n");
+                        info.append("Ack序号"+" : "+hm.get("Ack序号")+"\n");
+                        info.append("Seq序号"+" : "+hm.get("Seq序号")+"\n");
+                        info.append("是否使用http协议"+" : "+hm.get("是否使用http协议")+"\n");
+                    }else if (packet.hasHeader(Udp.ID)){
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("-------------------------------UDP头信息：-------------------------------\n");
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("源主机端口"+" : "+hm.get("源端口")+"\n");
+                        info.append("目的主机端口"+" : "+hm.get("目的端口")+"\n");
+                    }else if(packet.hasHeader(new Icmp())){
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("-------------------------------ICMP头信息：-------------------------------\n");
+                        info.append("------------------------------------------------------------------------------\n");
+                    }
+                    if (packet.hasHeader(Http.ID)){
+                        info.append("------------------------------------------------------------------------------\n");
+                        info.append("-------------------------------HTTP头信息：-------------------------------\n");
+                        info.append("------------------------------------------------------------------------------\n");
+                    }
+                    info.append("数据包内容"+" : "+hm.get("包内容")+"\n");
                 }
             }
         });
@@ -395,7 +422,7 @@ public class AppFrame extends JFrame {
                 capthread.start();   //开启抓包线程
             }else {
                 capturePackage.setDevice(device);
-                handlerInfo.clearpackets();
+                handlerInfo.clearAllpackets();
                 while (tableModel.getRowCount() > 0) {
                     tableModel.removeRow(tableModel.getRowCount() - 1);
                 }

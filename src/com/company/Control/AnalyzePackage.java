@@ -75,6 +75,8 @@ public class AnalyzePackage {
         if (packet.hasHeader(tcp)) {
             ack = Long.toString(tcp.ack());
             seq = Long.toString(tcp.seq());
+            analyzeResult.put("Fin", String.valueOf(tcp.flags_FIN()));
+            analyzeResult.put("Syn", String.valueOf(tcp.flags_SYN()));
         } else {
             ack = seq = null;
         }
@@ -117,11 +119,14 @@ public class AnalyzePackage {
     private static void handleSrcIp() {
         analyzeResult.put("源IP4","未知");
         analyzeResult.put("源IP6","未知");
+        analyzeResult.put("IP协议版本","未知");
         if (packet.hasHeader(ip4)) { // 如果packet有ip头部
             analyzeResult.put("源IP4",FormatUtils.ip(ip4.source()));
+            analyzeResult.put("IP协议版本","IPv4");
         }
         if (packet.hasHeader(ip6)) {
             analyzeResult.put("源IP6",FormatUtils.ip(ip6.source()));
+            analyzeResult.put("IP协议版本","IPv6");
         }
         return ;
     }
@@ -162,5 +167,8 @@ public class AnalyzePackage {
         String content = jb.toHexdump();
         return content;
     }
+    //解析arp
+    private static void handleArp(){
 
+    }
 }

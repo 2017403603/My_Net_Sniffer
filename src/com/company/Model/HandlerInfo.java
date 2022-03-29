@@ -1,6 +1,7 @@
 package com.company.Model;
 
 import com.company.Control.AnalyzePackage;
+import com.company.Utils.FilterUtils;
 import org.jnetpcap.packet.PcapPacket;
 
 import javax.swing.table.DefaultTableModel;
@@ -58,11 +59,25 @@ public class HandlerInfo {
     }
 
     //将list集合清除
-    public void clearpackets() {
+    public void clearAllpackets() {
         packetlist.clear();
+        analyzePacketlist.clear();
     }
-    //
 
+    //过滤后数据包重新显示
+    public static void ShowAfterFilter(){
+        FilterUtils filterUtils = new FilterUtils();
+        while (tablemodel.getRowCount() > 0) {
+            tablemodel.removeRow(tablemodel.getRowCount() - 1);
+        }
+        analyzePacketlist.clear();
+        for (int i=0;i< packetlist.size();i++){
+            if(filterUtils.IsFilter(packetlist.get(i), FilterProtocol, FilterSrcip, FilterDesip, FilterKey)){
+                analyzePacketlist.add(packetlist.get(i));
+                showTable(packetlist.get(i));
+            }
+        }
+    }
     //将抓到包的信息添加到列表
     public static void showTable(PcapPacket packet) {
         String[] rowData = getObj(packet);
@@ -78,10 +93,14 @@ public class HandlerInfo {
             DateFormat df = new SimpleDateFormat("HH:mm:ss");
             data[0] = df.format(date);
             HashMap<String,String> hm = new AnalyzePackage(packet).Analyzed();
-            data[1] = hm.get("源IP4").equals("未知") ? hm.get("源MAC") : hm.get("源IP4");
-            data[1]+=hm.get("源IP6").equals("未知") ? "": "\n"+hm.get("源IP6");
-            data[2] = hm.get("目的IP4").equals("未知") ? hm.get("目的MAC") : hm.get("目的IP4");
-            data[2]+=hm.get("目的IP6").equals("未知") ? "" : "\n"+hm.get("目的IP6");
+            data[1] = hm.get("源IP4").equals("未知") ?  hm.get("源IP6"): hm.get("源IP4");
+            data[2] = hm.get("目的IP4").equals("未知") ?  hm.get("目的IP6"): hm.get("目的IP4");
+            if(hm.get("源IP4").equals("未知") && hm.get("源IP6").equals("未知")){
+                data[1]=hm.get("源MAC");
+            }
+            if(hm.get("目的IP4").equals("未知") && hm.get("目的IP6").equals("未知")){
+                data[2]=hm.get("目的MAC");
+            }
             data[3] = hm.get("协议");
             data[4] = String.valueOf(packet.getCaptureHeader().wirelen());
         }

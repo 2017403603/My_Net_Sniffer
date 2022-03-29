@@ -21,10 +21,14 @@ public class MyPcapHandler<Object> implements PcapPacketHandler<Object> {
     @Override
     public void nextPacket(PcapPacket packet, Object handlerInfo) {
         HandlerInfo Info = (HandlerInfo) handlerInfo;
-        if (packet != null && filterUtils.IsFilter(packet, Info.FilterProtocol, Info.FilterSrcip, Info.FilterDesip, Info.FilterKey)) {
+        if (packet != null) {
+            //抓到的所有包都放入
             Info.packetlist.add(packet);
-            Info.analyzePacketlist.add(packet);
-            Info.showTable(packet);
+            //符合条件的包放入
+            if(filterUtils.IsFilter(packet, Info.FilterProtocol, Info.FilterSrcip, Info.FilterDesip, Info.FilterKey)){
+                Info.analyzePacketlist.add(packet);
+                Info.showTable(packet);
+            }
             System.out.println(packet);
         }
     }
