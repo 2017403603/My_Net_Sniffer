@@ -7,13 +7,13 @@ import java.util.HashMap;
 
 /**
  * @ClassName FilterUtils  //类名称
- * @Description: 类描述
+ * @Description: 类描述  用于过滤数据包
  * @Author: 程哥哥    //作者
  * @CreateDate: 2022/3/27 13:23	//创建时间
  * @UpdateUser: 更新人
- * @UpdateDate: 2022/3/27 13:23	//更新时间
+ * @UpdateDate: 2022/3/29 20:20	//更新时间
  * @UpdateRemark: 更新的信息
- * @Version: 1.0    //版本号
+ * @Version: 1.3    //版本号
  */
 
 public class FilterUtils {
@@ -74,5 +74,24 @@ public class FilterUtils {
             }
         }
         return true;
+    }
+    //设置追踪规则
+    public static boolean Istrace(PcapPacket packet,String IP,String Port){
+        //如果是默认值，默认跟踪
+        if (IP.equals("")||Port.equals("")){
+            return true;
+        }
+        HashMap<String,String> hm = new AnalyzePackage(packet).Analyzed();
+        if (hm.get("协议").equals("TCP")&&
+                (hm.get("源IP4").equals(IP)|| hm.get("源IP6").equals(IP))&&
+                hm.get("源端口").equals(Port)){
+            return true;
+        }
+        if (hm.get("协议").equals("TCP")&&
+                (hm.get("目的IP4").equals(IP)||hm.get("目的IP6").equals(IP))&&
+                hm.get("目的端口").equals(Port)){
+            return true;
+        }
+        return false;
     }
 }

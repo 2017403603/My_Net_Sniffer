@@ -9,10 +9,10 @@ import org.jnetpcap.PcapIf;
  * @Description: 类描述  启动线程抓包
  * @Author: 程哥哥    //作者
  * @CreateDate: 2022/3/26 15:57	//创建时间
- * @UpdateUser: 更新人
- * @UpdateDate: 2022/3/26 15:57	//更新时间
+ * @UpdateUser: 更新人程哥哥
+ * @UpdateDate: 2022/3/29 20:27	//更新时间
  * @UpdateRemark: 更新的信息
- * @Version: 1.0    //版本号
+ * @Version: 1.3    //版本号
  */
 
 public class CapturePackage implements Runnable {

@@ -32,11 +32,11 @@ import java.util.Map;
  * @ClassName AppFrame  //类名称
  * @Description: 类描述  图形界面
  * @Author: 程哥哥    //作者
- * @CreateDate: 2022/3/24 23:12	//创建时间
- * @UpdateUser: 更新人
- * @UpdateDate: 2022/3/24 23:12	//更新时间
- * @UpdateRemark: 更新的信息
- * @Version: 1.0    //版本号
+ * @CreateDate: 2022/3/25 23:12	//创建时间
+ * @UpdateUser: 更新人 程哥哥
+ * @UpdateDate: 2022/3/29 20:20	//更新时间
+ * @UpdateRemark: 更新的信息版本更新
+ * @Version: 1.3    //版本号
  */
 
 public class AppFrame extends JFrame {
@@ -49,7 +49,7 @@ public class AppFrame extends JFrame {
     //菜单条目
     JMenuItem item1, item2, item3, item4, item5, item6, item7;
     //原地址、目的地址、搜索地址按钮
-    JButton srcButton, desButton, searchButton;
+    JButton srcButton, desButton, searchButton,trackButton;
     //容器
     JPanel jPanel;
     //滚动条
@@ -70,7 +70,7 @@ public class AppFrame extends JFrame {
     //UI部分
     public AppFrame() {
         //标题设置
-        this.setTitle("网络嗅探器1.0");
+        this.setTitle("网络嗅探器1.3");
         //起始坐标、长宽
         this.setBounds(250, 150, 900, 600);
         //菜单条
@@ -124,12 +124,17 @@ public class AppFrame extends JFrame {
         searchButton = new JButton(" 查找  ");
         //设置字体
         searchButton.setFont(new Font("", Font.BOLD, 20));
+        //tcp+port流追踪
+        trackButton = new JButton(" IP+Port流追踪  ");
+        //设置字体
+        trackButton.setFont(new Font("", Font.BOLD, 20));
         //将菜单添加到菜单条上
         jMenuBar.add(jMenu1);
         jMenuBar.add(jMenu2);
         jMenuBar.add(srcButton);
         jMenuBar.add(desButton);
         jMenuBar.add(searchButton);
+        jMenuBar.add(trackButton);
         //菜单条设置
         setJMenuBar(jMenuBar);
         //表设置
@@ -296,6 +301,16 @@ public class AppFrame extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         String fkeyword = JOptionPane.showInputDialog("请输入数据关键字，以筛选数据包：");
                         handlerInfo.setFilterKey("keyword " + fkeyword);
+                        handlerInfo.ShowAfterFilter();
+                    }
+                });
+        trackButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String ip_port = JOptionPane.showInputDialog("请输入要追踪的IP地址和Port端口(输入数据格式为 IP地址:Port端口)，以追踪TCP流：");
+                        String[] str=ip_port.split(":");
+                        handlerInfo.setTraceIP(str[0]);
+                        handlerInfo.setTracePort(str[1]);
                         handlerInfo.ShowAfterFilter();
                     }
                 });

@@ -13,9 +13,9 @@ import java.util.List;
  * @Author: 程哥哥    //作者
  * @CreateDate: 2022/3/26 14:01	//创建时间
  * @UpdateUser: 更新人
- * @UpdateDate: 2022/3/26 14:01	//更新时间
+ * @UpdateDate: 2022/3/29 20:25	//更新时间
  * @UpdateRemark: 更新的信息
- * @Version: 1.0    //版本号
+ * @Version: 1.3    //版本号
  */
 
 public class NetworkCard {
