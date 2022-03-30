@@ -67,10 +67,12 @@ public class AnalyzePackage {
         analyzeResult.put("目的MAC地址类型", destLG=="0"?"出厂MAC":"分配的MAC");
         analyzeResult.put("源主机传播方式", srcIG=="0"?"单播":"广播");
         analyzeResult.put("目的主机传播方式", destIG=="0"?"单播":"广播");
+        analyzeResult.put("是否有其他切片","未知");
         handleSrcIp();
         handleDestIp();
+        analyzeResult.put("是否有其他切片", String.valueOf(ip4.isFragmented()));
         analyzeResult.put("源端口", parseSrcPort());
-        analyzeResult.put("目的端口", parseDestMac());
+        analyzeResult.put("目的端口", parseDesPort());
         String ack,seq;
         if (packet.hasHeader(tcp)) {
             ack = Long.toString(tcp.ack());
@@ -128,6 +130,7 @@ public class AnalyzePackage {
             analyzeResult.put("源IP6",FormatUtils.ip(ip6.source()));
             analyzeResult.put("IP协议版本","IPv6");
         }
+
         return ;
     }
 
@@ -169,6 +172,43 @@ public class AnalyzePackage {
     }
     //解析arp
     private static void handleArp(){
+
+    }
+    public static HashMap<String,String> fieldMap=null;
+    public static ConcurrentHashMap<String,String> httpParams=null;
+    public static String httpresult=null;
+    //解析http
+    public static void handleHttp(){
+        if(!packet.hasHeader(Http.ID)) {
+            return ;
+        }
+        http = packet.getHeader(http);
+        //获取当前http请求中存在的请求头参数
+        String[] fieldArray = http.fieldArray();
+        //请求头参数
+        fieldMap = new HashMap<>();
+        for (String temp : fieldArray) {
+            fieldMap.put(temp.toUpperCase(), temp);
+        }
+        //http请求头参数
+        httpParams = new ConcurrentHashMap<>();
+        //获取http定义的请求头参数
+        Http.Request[] valuesKeys = Http.Request.values();
+        for (Http.Request value : valuesKeys) {
+            //使用hash进行匹配，将双重for变成一重for
+            if(fieldMap.containsKey(value.name().toUpperCase().replace("_","-"))) {
+                httpParams.put(value.toString(),http.fieldValue(value));
+            }
+        }
+        //获取http中请求的传输报文
+        if(http.hasPayload()) {
+            try {
+                byte[] payload = http.getPayload();
+                httpresult = new String(payload,"UTF-8");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 }

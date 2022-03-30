@@ -23,10 +23,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileOutputStream;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName AppFrame  //类名称
@@ -338,9 +338,11 @@ public class AppFrame extends JFrame {
                             new ActionListener(){
                                 public void actionPerformed(ActionEvent e3) {
                                     String text = info.getText();
-                                    int name = (int)System.currentTimeMillis();
+                                    Date date = new Date(System.currentTimeMillis());
+                                    DateFormat df = new SimpleDateFormat("HH点mm秒ss");
+                                    String name = df.format(date);
                                     try {
-                                        FileOutputStream fos = new FileOutputStream("d://cgg_sniffer//"+name+".txt");
+                                        FileOutputStream fos = new FileOutputStream("C:\\Users\\程哥哥\\Desktop\\临时文件\\软件系统与安全\\My_Net_Sniffer\\"+name+".txt");
                                         fos.write(text.getBytes());
                                         fos.close();
                                     } catch (Exception e) {
@@ -358,7 +360,8 @@ public class AppFrame extends JFrame {
                     //获得分析后的信息
                     Map<String,String> hm = new HashMap<String,String>();
                     PcapPacket packet = packetlist.get(row);
-                    hm = new AnalyzePackage(packet).Analyzed();
+                    AnalyzePackage analyzePackage = new AnalyzePackage(packet);
+                    hm = analyzePackage.Analyzed();
                     info.append("                               "+hm.get("协议")+"数据包"+"                               \n\n\n");
                     if(packet.hasHeader(Ethernet.ID)){
                         info.append("------------------------------------------------------------------------------\n");
@@ -381,10 +384,13 @@ public class AppFrame extends JFrame {
                         info.append("源IP6地址"+" : "+hm.get("源IP6")+"\n");
                         info.append("目的IP4地址"+" : "+hm.get("目的IP4")+"\n");
                         info.append("目的IP6地址"+" : "+hm.get("目的IP6")+"\n");
+                        info.append("是否有其他切片"+" : "+hm.get("是否有其他切片")+"\n");
                     }else if(packet.hasHeader(new Arp())){
                         info.append("------------------------------------------------------------------------------\n");
                         info.append("-------------------------------ARP头信息：-------------------------------\n");
                         info.append("------------------------------------------------------------------------------\n");
+                        Arp arp = packet.getHeader(new Arp());
+                        info.append(arp+"\n");
                     }
                     if (packet.hasHeader(Tcp.ID)){
                         info.append("------------------------------------------------------------------------------\n");
@@ -407,13 +413,27 @@ public class AppFrame extends JFrame {
                         info.append("------------------------------------------------------------------------------\n");
                         info.append("-------------------------------ICMP头信息：-------------------------------\n");
                         info.append("------------------------------------------------------------------------------\n");
+                        Icmp icmp = packet.getHeader(new Icmp());
+                        info.append(icmp+"\n");
                     }
                     if (packet.hasHeader(Http.ID)){
                         info.append("------------------------------------------------------------------------------\n");
                         info.append("-------------------------------HTTP头信息：-------------------------------\n");
                         info.append("------------------------------------------------------------------------------\n");
+                        analyzePackage.handleHttp();
+                        for(Map.Entry<String,String> me : analyzePackage.fieldMap.entrySet())
+                        {
+                            info.append(me.getKey()+" : "+me.getValue()+"\n");
+                        }
+                        for(Map.Entry<String,String> me : analyzePackage.httpParams.entrySet())
+                        {
+                            info.append(me.getKey()+" : "+me.getValue()+"\n");
+                        }
+                        info.append(analyzePackage.httpresult);
                     }
-                    info.append("数据包内容"+" : "+hm.get("包内容")+"\n");
+
+                    info.append("------------------------------------------------------------------------------\n");
+                    info.append("原始数据包内容"+" : "+hm.get("包内容")+"\n");
                 }
             }
         });
