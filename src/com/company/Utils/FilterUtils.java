@@ -21,31 +21,31 @@ public class FilterUtils {
     public static boolean IsFilter(PcapPacket packet, String FilterProtocol, String FilterSrcip, String FilterDesip, String FilterKey) {
         HashMap<String,String> hm = new AnalyzePackage(packet).Analyzed();
         //协议过滤
-        if (FilterProtocol.contains("Ethernet II")) {
+        if (FilterProtocol.equals("Ethernet II")) {
             if (!hm.get("协议").equals("ETHERNET")) {
                 return false;
             }
-        } else if (FilterProtocol.contains("IP")) {
+        } else if (FilterProtocol.equals("IP")) {
             if (!(hm.get("协议").equals("IP4")||hm.get("协议").equals("IP6"))) {
                 return false;
             }
-        } else if (FilterProtocol.contains("ICMP")) {
+        } else if (FilterProtocol.equals("ICMP")) {
             if (!hm.get("协议").equals("ICMP")) {
                 return false;
             }
-        } else if (FilterProtocol.contains("ARP")) {
+        } else if (FilterProtocol.equals("ARP")) {
             if (!hm.get("协议").equals("ARP")) {
                 return false;
             }
-        } else if (FilterProtocol.contains("UDP")) {
+        } else if (FilterProtocol.equals("UDP")) {
             if (!hm.get("协议").equals("UDP")) {
                 return false;
             }
-        } else if (FilterProtocol.contains("TCP")) {
+        } else if (FilterProtocol.equals("TCP")) {
             if (!hm.get("协议").equals("TCP")) {
                 return false;
             }
-        } else if (FilterProtocol.contains("HTTP")) {
+        } else if (FilterProtocol.equals("HTTP")) {
             if (!hm.get("协议").equals("HTTP")) {
                 return false;
             }
@@ -53,23 +53,20 @@ public class FilterUtils {
 
         }
         //源ip地址过滤
-        if (FilterSrcip.contains("src")) {
-            String src = FilterSrcip.substring(4, FilterSrcip.length());
-            if (!(hm.get("源IP4").equals(src)||hm.get("源IP6").equals(src))) {
+        if (!FilterSrcip.equals("")) {
+            if (!(hm.get("源IP4").equals(FilterSrcip)||hm.get("源IP6").equals(FilterSrcip))) {
                 return false;
             }
         }
         //目的ip地址过滤
-        if (FilterDesip.contains("des")) {
-            String des = FilterDesip.substring(4, FilterDesip.length());
-            if (!(hm.get("目的IP4").equals(des)||hm.get("目的IP6").equals(des))) {
+        if (!FilterDesip.equals("")) {
+            if (!(hm.get("目的IP4").equals(FilterDesip)||hm.get("目的IP6").equals(FilterDesip))) {
                 return false;
             }
         }
         //关键字过滤
-        if (FilterKey.contains("keyword")) {
-            String keyword = FilterKey.substring(8, FilterKey.length());
-            if (!hm.get("包内容").contains(keyword)) {
+        if (!FilterKey.equals("")) {
+            if (!hm.get("包内容").contains(FilterKey)) {
                 return false;
             }
         }

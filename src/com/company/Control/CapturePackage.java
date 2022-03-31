@@ -87,7 +87,7 @@ public class CapturePackage implements Runnable {
             pcap.loop(cnt, myPcapHandler, handlerInfo);
 //            }
             try {
-                Thread.sleep(50);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
