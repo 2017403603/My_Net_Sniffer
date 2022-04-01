@@ -86,11 +86,11 @@ public class CapturePackage implements Runnable {
                 //每个数据包将被分派到抓包处理器Handler
             pcap.loop(cnt, myPcapHandler, handlerInfo);
 //            }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(0);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             System.out.println("list的大小为：" + handlerInfo.packetlist.size());
         }
 //        pcap.close();
