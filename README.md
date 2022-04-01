@@ -1,7 +1,4 @@
-# My_Net_Sniffer
-此仓库用于软件系统与安全课程网络嗅探器实验
-
-# **网络嗅探器设计与实现**
+# **基于Jnetpcap的网络嗅探器（抓包程序）设计与实现**
 
 作者：程哥哥  学号：xxxx
 
@@ -9,29 +6,29 @@
 
 此程序是由自己编写的个人网络嗅探器，相当于著名的包捕获软件[Wireshark](https://so.csdn.net/so/search?q=Wireshark&spm=1001.2101.3001.7020)的简化版，界面参考至别人的博客，由JFrame编写，主要业务逻辑基于JnetPcap开发，程序框架为MVC。主要功能如下：
 
-\1. 实现了运行主机网卡选择进行抓包 
+1.  实现了运行主机网卡选择进行抓包 
 
-\2. 实现了IOS五层模型下所有数据包的捕获及显示 
+2.  实现了IOS五层模型下所有数据包的捕获及显示 
 
-\3. 实现了抓取的数据包从链路层到应用层的逐层包头的信息展示及分析 
+3.  实现了抓取的数据包从链路层到应用层的逐层包头的信息展示及分析 
 
-\4. 实现了Ethernet、IP、ARP、ICMP、UDP、TCP、HTTP七种数据包的过滤及分析 
+4.  实现了Ethernet、IP、ARP、ICMP、UDP、TCP、HTTP七种数据包的过滤及分析 
 
-\5. 实现了源ip、目的ip、及包携带内容的关键字过滤功能 
+5.  实现了源ip、目的ip、及包携带内容的关键字过滤功能 
 
-\6. 实现了基于IP+Port的TCP流追踪功能
+6.  实现了基于IP+Port的TCP流追踪功能
 
-\7. 实现了所分析的包内容的数据保存。
+7.  实现了所分析的包内容的数据保存。
 
-Github地址：https://github.com/2017403603/My_Net_Sniffer
+​	Github地址：[https://github.com/2017403603/My_Net_Sniffer](https://github.com/2017403603/My_Net_Sniffer)
 
 ### 一、**开发环境**
 
 Win10+IDEA+Jdk1.8+Wincap+Jnetpcap  
 
-UI界面参考：https://blog.csdn.net/qq_34838643/article/details/78891127
+UI界面参考：[https://blog.csdn.net/qq_34838643/article/details/78891127](https://blog.csdn.net/qq_34838643/article/details/78891127)
 
-Jnetpcap教程参考：https://blog.csdn.net/m0_37892044/article/details/120085261
+Jnetpcap教程参考：[https://blog.csdn.net/m0_37892044/article/details/120085261](https://blog.csdn.net/m0_37892044/article/details/120085261)
 
 ### 二、**Jnetpcap**
 
@@ -93,13 +90,13 @@ Model层：无
 
 具体运行情况可以查看演示视频，以下为软件运行简要展示。
 
-\1. **主界面**
+1. **主界面**
 
 主页面可以显示抓取到的数据包的时间、源IP或者源MAC地址、目的IP或者目的MAC地址、数据包协议、数据包原始长度，如下图所示：
 
 <img src=".\图片存储\1.jpg" alt="img" style="zoom: 67%;" /> 
 
-\2. **过滤条件**
+2. **过滤条件**
 
 <img src=".\图片存储\2.jpg" alt="img" style="zoom:67%;" />  <img src="file:///C:\Users\程哥哥\AppData\Local\Temp\ksohtml\wps2231.tmp.jpg" alt="img" style="zoom:67%;" />
 
@@ -125,7 +122,7 @@ Model层：无
 
 图6为点击主界面“IP+Port流追踪”菜单项的展示情况，输入想要追踪的IP地址和Port端口(输入格式为 IP地址:Port端口)，点击确认可以追踪具体IP主机下具体Port端口的所有进出TCP数据包
 
-\3. **数据包内容展示**
+3. **数据包内容展示**
 
 <img src=".\图片存储\8.jpg" alt="img" style="zoom:67%;" /> <img src=".\图片存储\9.jpg" alt="img" style="zoom:67%;" />
 
@@ -159,6 +156,6 @@ Model层：无
 
 本程序从编写到结束一共历时五天左右，在此过程中由于不熟悉Jnetpcap包的使用，在阅读Jnetpcap包文档上花费了大量时间，项目框架采用经典mvc，写到后面的时候，代码有点乱，因此整个程序耦合度有些高，代码可读性应该还算说得过去。后期又花费了一些时间增强代码的健壮性，程序现有功能方面个人觉得完整度还行。由于时间原因，成程序只实现了Ethernet、IP、ARP、ICMP、UDP、TCP、HTTP七种数据包的过滤及分析，本程序还存在两个比较明显的问题，至今没想到解决办法：
 
-\1. 程序选择网卡启动抓包线程有一定几率失败（盲猜应该是防火墙的原因）
+1.  程序选择网卡启动抓包线程有一定几率失败（盲猜应该是防火墙的原因）
 
-\2. 程序抓包时，在遇到流量较大情况，会出现漏包现象。（应该是以太网网速太快，抓包速率跟不上的原因）
+2.  程序抓包时，在遇到流量较大情况，会出现漏包现象。（应该是以太网网速太快，抓包速率跟不上的原因）
